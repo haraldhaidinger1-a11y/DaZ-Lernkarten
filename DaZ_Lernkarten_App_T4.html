@@ -1,0 +1,3495 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DaZ Lernkarten</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f6f9;
+  color:#222;
+}
+
+header{
+  padding:24px;
+  text-align:center;
+  background:white;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+h1{
+  margin:0;
+  font-size:42px;
+}
+
+.subtitle{
+  margin-top:10px;
+  color:#666;
+}
+
+.controls{
+  margin-top:20px;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+}
+
+button{
+  border:none;
+  padding:12px 18px;
+  border-radius:14px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+}
+
+.filter-btn.active{
+  outline:3px solid black;
+}
+
+.blue{
+  background:#4a90e2;
+  color:white;
+}
+
+.green{
+  background:#35b56a;
+  color:white;
+}
+
+.orange{
+  background:#f39c12;
+  color:white;
+}
+
+.red{
+  background:#e74c3c;
+  color:white;
+}
+
+.gray{
+  background:#777;
+  color:white;
+}
+
+.dark-btn{
+  background:#222;
+  color:white;
+}
+
+.search{
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  min-width:240px;
+}
+
+.stats{
+  margin-top:18px;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.container{
+  padding:30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;
+}
+
+.card{
+  height:220px;
+  perspective:1200px;
+}
+
+.inner-card{
+  width:100%;
+  height:100%;
+  position:relative;
+  transition:transform 0.7s;
+  transform-style:preserve-3d;
+  cursor:pointer;
+}
+
+.card.flipped .inner-card{
+  transform:rotateY(180deg);
+}
+
+.face{
+  position:absolute;
+  width:100%;
+  height:100%;
+  border-radius:22px;
+  padding:24px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  backface-visibility:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+
+.front{
+  color:white;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.back{
+  background:white;
+  transform:rotateY(180deg);
+  font-size:20px;
+  font-weight:bold;
+}
+
+.category{
+  position:absolute;
+  top:14px;
+  left:14px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.darkmode{
+  background:#111;
+  color:white;
+}
+
+.darkmode header{
+  background:#1c1c1c;
+}
+
+.darkmode .back{
+  background:#222;
+  color:white;
+}
+
+.quiz-button{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:999;
+  padding:16px 22px;
+  border:none;
+  border-radius:18px;
+  background:#111;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>📚 DaZ Lernkarten</h1>
+
+<div class="subtitle">
+Interaktive Lernkarten für Deutsch als Zweitsprache & Sprachliche Bildung
+</div>
+
+<div class="controls">
+
+<button class="filter-btn gray active"
+onclick="filterCards('all', this)">
+Alle
+</button>
+
+<button class="filter-btn blue"
+onclick="filterCards('sprachwissenschaft', this)">
+Sprachwissenschaft
+</button>
+
+<button class="filter-btn green"
+onclick="filterCards('spracherwerb', this)">
+Spracherwerb
+</button>
+
+<button class="filter-btn orange"
+onclick="filterCards('mehrsprachigkeit', this)">
+Mehrsprachigkeit
+</button>
+
+<button class="filter-btn red"
+onclick="filterCards('zweitspracherwerb', this)">
+Zweitspracherwerb
+</button>
+
+<button class="filter-btn gray"
+onclick="filterCards('t4', this)">
+Besonderheiten des Deutschen
+</button>
+
+</div>
+
+<div class="controls">
+
+<button class="gray" onclick="shuffleCards()">
+🔀 Zufallsmodus
+</button>
+
+<button class="dark-btn" onclick="toggleDarkMode()">
+🌙 Dark Mode
+</button>
+
+<button class="gray" onclick="resetCards()">
+♻️ Reset
+</button>
+
+<input
+class="search"
+type="text"
+id="searchInput"
+placeholder="🔍 Begriff suchen..."
+onkeyup="searchCards()"
+>
+
+</div>
+
+<div class="stats" id="stats">
+0 Karten sichtbar
+</div>
+
+</header>
+
+<!-- ========================================= -->
+<!-- KARTEN -->
+<!-- ========================================= -->
+
+<div class="container" id="cardContainer">
+
+<!-- Sprachwissenschaft -->
+
+<div class="card sprachwissenschaft" data-question="langue">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was bedeutet langue?
+</div>
+<div class="face back">
+Das abstrakte Sprachsystem.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="signifikant">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was ist ein Signifikant?
+</div>
+<div class="face back">
+Laut- oder Wortform eines Zeichens.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="signifikat">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was ist ein Signifikat?
+</div>
+<div class="face back">
+Bedeutung oder Konzept eines Zeichens.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="sprachwissenschaft">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Welche Bereiche untersucht die Sprachwissenschaft?
+</div>
+<div class="face back">
+Sprache im Gehirn, Sprachsystem und Sprachgebrauch.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="parole">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was bedeutet parole?
+</div>
+<div class="face back">
+Der tatsächliche Sprachgebrauch.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="historische philologie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Womit beschäftigt sich historische Philologie?
+</div>
+<div class="face back">
+Mit Sprachgeschichte und Sprachwandel.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="sprachtypologie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Sprachtypologie?
+</div>
+<div class="face back">
+Sprachstrukturen und Sprachtypen.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="phonologie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Phonologie?
+</div>
+<div class="face back">
+Das Lautsystem einer Sprache.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="absolute universalie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was ist eine absolute Universalie?
+</div>
+<div class="face back">
+Merkmale, die alle Sprachen gemeinsam haben.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="morphologie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Morphologie?
+</div>
+<div class="face back">
+Wortstruktur und Wortbildung.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="semantik">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Semantik?
+</div>
+<div class="face back">
+Die Bedeutung von Wörtern und Sätzen.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="pragmatik">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Pragmatik?
+</div>
+<div class="face back">
+Sprache im Kontext.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="syntax">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Syntax?
+</div>
+<div class="face back">
+Satzbau und grammatische Struktur.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="arbitraritaet">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was bedeutet Arbiträrität?
+
+</div>
+
+<div class="face back">
+
+Sprachzeichen sind willkürlich.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="semiotik">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front blue">
+<div class="category">Sprachwissenschaft</div>
+Was untersucht die Semiotik?
+</div>
+<div class="face back">
+Zeichen und Zeichensysteme.
+</div>
+</div>
+</div>
+
+<div class="card sprachwissenschaft" data-question="ikon">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was ist ein Ikon?
+
+</div>
+
+<div class="face back">
+
+Ein Zeichen mit Ähnlichkeit zum Bezeichneten.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="index">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was ist ein Index?
+
+</div>
+
+<div class="face back">
+
+Ein Zeichen mit direkter Beziehung zum Bezeichneten.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="symbol">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was ist ein Symbol?
+
+</div>
+
+<div class="face back">
+
+Ein Zeichen mit konventioneller Bedeutung.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="synchron">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was bedeutet synchron?
+
+</div>
+
+<div class="face back">
+
+Betrachtung einer Sprache zu einem bestimmten Zeitpunkt.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="diachron">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was bedeutet diachron?
+
+</div>
+
+<div class="face back">
+
+Betrachtung sprachlicher Entwicklung über die Zeit.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="strukturalismus">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Wer gilt als Begründer des Strukturalismus?
+
+</div>
+
+<div class="face back">
+
+Ferdinand de Saussure.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="zeichenmodell">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Aus welchen Teilen besteht das Zeichenmodell nach Saussure?
+
+</div>
+
+<div class="face back">
+
+Aus Signifikant und Signifikat.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="universalgrammatik">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was ist die Universalgrammatik?
+
+</div>
+
+<div class="face back">
+
+Gemeinsame Prinzipien aller menschlichen Sprachen.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="kompetenz">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was versteht Chomsky unter Kompetenz?
+
+</div>
+
+<div class="face back">
+
+Das innere Wissen über Sprache.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="performanz">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Was versteht Chomsky unter Performanz?
+
+</div>
+
+<div class="face back">
+
+Den tatsächlichen Sprachgebrauch.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card sprachwissenschaft" data-question="wals">
+
+<div class="inner-card" onclick="flipCard(this)">
+
+<div class="face front blue">
+
+<div class="category">Sprachwissenschaft</div>
+
+Wofür steht WALS?
+
+</div>
+
+<div class="face back">
+
+World Atlas of Language Structures.
+</div>
+</div>
+</div>
+
+<!-- Spracherwerb -->
+
+<div class="card spracherwerb" data-question="behaviorismus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was beschreibt der Behaviorismus?
+</div>
+<div class="face back">
+Lernen durch Nachahmung und Verstärkung.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="behaviorismus unzureichend">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Warum gilt der Behaviorismus als unzureichend?
+</div>
+<div class="face back">
+Er erklärt keine kreativen Sprachleistungen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="skinner">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Wer vertritt den Behaviorismus?
+</div>
+<div class="face back">
+B. F. Skinner.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="reifungstheorie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont die Reifungstheorie?
+</div>
+<div class="face back">
+Angeborene sprachliche Strukturen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="lad">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was bedeutet LAD?
+</div>
+<div class="face back">
+Language Acquisition Device.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="lass">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was bedeutet LASS?
+</div>
+<div class="face back">
+Language Acquisition Support System.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="piaget">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont Piaget?
+</div>
+<div class="face back">
+Kognitive Entwicklung beeinflusst Sprache.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="sprechakttheorie">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Welche Aussage passt zur Sprechakttheorie?
+</div>
+<div class="face back">
+Sprechen ist Handeln.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="vygotskij">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont Vygotskij?
+</div>
+<div class="face back">
+Soziale Interaktion ist zentral.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="illokution">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was ist ein illokutionärer Akt?
+</div>
+<div class="face back">
+Die sprachliche Absicht.
+</div>
+</div>
+</div>
+
+
+<div class="card spracherwerb" data-question="chomsky">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Wer entwickelte die Theorie der Universalgrammatik?
+</div>
+<div class="face back">
+Noam Chomsky.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="universalgrammatik">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was ist die Universalgrammatik?
+</div>
+<div class="face back">
+Angeborene Prinzipien, die allen Sprachen zugrunde liegen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="kritischephase">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was besagt die Hypothese der kritischen Phase?
+</div>
+<div class="face back">
+Spracherwerb gelingt in jungen Jahren besonders leicht.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="nativismus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont der Nativismus?
+</div>
+<div class="face back">
+Angeborene sprachliche Fähigkeiten.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="bruner">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Wer entwickelte das LASS-Konzept?
+</div>
+<div class="face back">
+Jerome Bruner.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="zone">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was ist die Zone der nächsten Entwicklung?
+</div>
+<div class="face back">
+Der Bereich zwischen selbstständigem und unterstützt möglichem Lernen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="scaffolding">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was bedeutet Scaffolding?
+</div>
+<div class="face back">
+Temporäre Unterstützung beim Lernen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="input">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Warum ist sprachlicher Input wichtig?
+</div>
+<div class="face back">
+Er bildet die Grundlage für Spracherwerb.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="output">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was versteht man unter Output?
+</div>
+<div class="face back">
+Die aktive Sprachproduktion von Lernenden.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="motherese">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was ist Motherese?
+</div>
+<div class="face back">
+Kindgerichtete Sprache mit vereinfachten Strukturen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="erwerbsreihenfolge">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was beschreibt die Erwerbsreihenfolge?
+</div>
+<div class="face back">
+Sprachliche Strukturen werden in typischen Stufen erworben.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="interaktionismus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont der Interaktionismus?
+</div>
+<div class="face back">
+Sprache entsteht durch soziale Interaktion.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="kognitivismus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was betont der Kognitivismus?
+</div>
+<div class="face back">
+Spracherwerb hängt mit allgemeiner Denkentwicklung zusammen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="sprachfoerderung">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Was ist das Ziel sprachlicher Förderung?
+</div>
+<div class="face back">
+Sprachliche Kompetenzen gezielt zu unterstützen.
+</div>
+</div>
+</div>
+
+<div class="card spracherwerb" data-question="kindgerichtete sprache">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front green">
+<div class="category">Spracherwerb</div>
+Welche Merkmale hat kindgerichtete Sprache?
+</div>
+<div class="face back">
+Langsameres Tempo, Wiederholungen und vereinfachte Strukturen.
+</div>
+</div>
+</div>
+
+<!-- Mehrsprachigkeit -->
+
+<div class="card mehrsprachigkeit" data-question="bics">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet BICS?
+</div>
+<div class="face back">
+Alltagssprachliche Kompetenz.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="calp">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet CALP?
+</div>
+<div class="face back">
+Bildungssprachliche Kompetenz.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="bics schneller">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Welche Kompetenz entwickelt sich schneller?
+</div>
+<div class="face back">
+BICS entwickelt sich meist schneller.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="hymes">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Wer entwickelte kommunikative Kompetenz?
+</div>
+<div class="face back">
+Dell Hymes.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="gogolin">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Wer prägte den Begriff Bildungssprache?
+</div>
+<div class="face back">
+Ingrid Gogolin.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="bernstein">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Wer unterschied restringierten und elaborierten Code?
+</div>
+<div class="face back">
+Basil Bernstein.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="verstaendnis">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Nach heutigem Verständnis gilt als Mehrsprachigkeit, wer...
+</div>
+<div class="face back">
+...regelmäßig mehrere Sprachen verwendet. 
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="konzepte">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Mehrsprachige Menschen sind laut modernen Konzepten...
+</div>
+<div class="face back">
+...Besitzer und Besitzerinnen eines dynamischen Sprachrepertoires.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="sprachvergleich">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Soll Sprachvergleich vermieden werden?
+</div>
+<div class="face back">
+Nein, Sprachvergleich gilt als hilfreich.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="mehrsprachigkeit ressource">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Wie bewertet moderne Didaktik Mehrsprachigkeit?
+</div>
+<div class="face back">
+Als Ressource und Kompetenz.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="halbsprachigkeit kritik">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Warum wird Halbsprachigkeit kritisiert?
+</div>
+<div class="face back">
+Der Begriff gilt als stigmatisierend.
+</div>
+</div>
+</div>
+
+
+<div class="card mehrsprachigkeit" data-question="cummins">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Wer entwickelte die Interdependenzhypothese?
+</div>
+<div class="face back">
+Jim Cummins.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="interdependenz">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was besagt die Interdependenzhypothese?
+</div>
+<div class="face back">
+Sprachen beeinflussen und unterstützen sich gegenseitig.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="schwellenhypothese">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was beschreibt die Schwellenhypothese?
+</div>
+<div class="face back">
+Bestimmte Sprachkompetenzen fördern kognitive Vorteile.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="alltagssprache">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was versteht man unter Alltagssprache?
+</div>
+<div class="face back">
+Sprachgebrauch in alltäglichen Kommunikationssituationen.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="bildungssprache">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was versteht man unter Bildungssprache?
+</div>
+<div class="face back">
+Sprache für schulisches und akademisches Lernen.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="translanguaging">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet Translanguaging?
+</div>
+<div class="face back">
+Flexible Nutzung des gesamten Sprachrepertoires.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="codeswitching">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was ist Code-Switching?
+</div>
+<div class="face back">
+Der Wechsel zwischen zwei Sprachen innerhalb einer Kommunikation.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="codemixing">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was ist Code-Mixing?
+</div>
+<div class="face back">
+Die Vermischung sprachlicher Elemente verschiedener Sprachen.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="languageawareness">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet Language Awareness?
+</div>
+<div class="face back">
+Bewusstheit über Sprache und Sprachgebrauch.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="sprachbewusstheit">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Warum ist Sprachbewusstheit wichtig?
+</div>
+<div class="face back">
+Sie unterstützt Sprachlernen und Sprachreflexion.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="additive">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was ist additive Mehrsprachigkeit?
+</div>
+<div class="face back">
+Eine neue Sprache wird zusätzlich erworben, ohne die Erstsprache zu verdrängen.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="subtraktive">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was ist subtraktive Mehrsprachigkeit?
+</div>
+<div class="face back">
+Die Zweitsprache verdrängt langfristig die Erstsprache.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="habitus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was kritisiert Gogolin mit dem Begriff „monolingualer Habitus“?
+</div>
+<div class="face back">
+Die einsprachige Orientierung vieler Bildungssysteme.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="herkunftssprache">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Warum sind Herkunftssprachen wichtig?
+</div>
+<div class="face back">
+Sie sind Teil der Identität und fördern weitere Sprachentwicklung.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="sprachsensibel">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet sprachsensibler Unterricht?
+</div>
+<div class="face back">
+Fachunterricht berücksichtigt sprachliche Lernprozesse.
+</div>
+</div>
+</div>
+
+<div class="card mehrsprachigkeit" data-question="durchgaengige">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front orange">
+<div class="category">Mehrsprachigkeit</div>
+Was bedeutet durchgängige Sprachbildung?
+</div>
+<div class="face back">
+Sprachförderung in allen Fächern und Bildungsstufen.
+</div>
+</div>
+</div>
+
+
+<!-- Zweitspracherwerb -->
+
+<div class="card zweitspracherwerb" data-question="interlanguage">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was beschreibt die Interlanguage-Hypothese?
+</div>
+<div class="face back">
+Lernersprachen entwickeln sich schrittweise.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="identitaetshypothese">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was besagt die Identitätshypothese?
+</div>
+<div class="face back">
+Sprachen werden nach ähnlichen Prinzipien gelernt.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="cummins">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was beschreibt Cummins?
+</div>
+<div class="face back">
+Erst- und Zweitsprache beeinflussen sich gegenseitig.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="interlanguage fehler">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Wie bewertet die Interlanguage-Hypothese Fehler?
+</div>
+<div class="face back">
+Als kreative Übergangsphänomene.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="kontrastivhypothese">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was beschreibt die Kontrastivhypothese?
+</div>
+<div class="face back">
+Unterschiede verursachen Fehler.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="fossilierung">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was bedeutet Fossilierung?
+</div>
+<div class="face back">
+Stillstand im Lernprozess.
+</div>
+</div>
+</div>
+
+<div class="card zweitspracherwerb" data-question="teachability">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front red">
+<div class="category">Zweitspracherwerb</div>
+Was beschreibt die Teachability-Hypothese?
+</div>
+<div class="face back">
+Unterricht soll an Erwerbsphasen angepasst werden.
+</div>
+</div>
+</div>
+
+
+<div class="card t4" data-question="vokalsystem">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist eine Besonderheit des deutschen Vokalsystems?</div><div class="face back">Das Deutsche besitzt ein sehr komplexes Vokalsystem mit ca. 14–17 Vokalen.</div></div></div>
+
+<div class="card t4" data-question="lang kurzvokale">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Welche Funktion haben Lang- und Kurzvokale?</div><div class="face back">Sie unterscheiden Bedeutungen, z. B. Bahn – Bann.</div></div></div>
+
+<div class="card t4" data-question="diphthonge">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum sind Diphthonge oft schwierig?</div><div class="face back">Sie sind gleitende Laute und existieren nicht in allen Sprachen.</div></div></div>
+
+<div class="card t4" data-question="auslautverhaertung">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was bedeutet Auslautverhärtung?</div><div class="face back">Stimmhafte Konsonanten werden am Wortende stimmlos gesprochen.</div></div></div>
+
+<div class="card t4" data-question="komposition">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist eine Komposition?</div><div class="face back">Die Bildung eines neuen Wortes aus mehreren Wörtern, z. B. Milchkaffee.</div></div></div>
+
+<div class="card t4" data-question="modalpartikeln">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum sind Modalpartikeln schwierig?</div><div class="face back">Ihre Bedeutung hängt stark vom Kontext ab und ist oft nicht direkt übersetzbar.</div></div></div>
+
+<div class="card t4" data-question="genus">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum ist das Genus schwierig?</div><div class="face back">Es ist meist nicht eindeutig aus Bedeutung oder Wortform ableitbar.</div></div></div>
+
+<div class="card t4" data-question="mentales lexikon">
+<div class="inner-card" onclick="flipCard(this)"><div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist das mentale Lexikon?</div><div class="face back">Der vernetzte Speicher sprachlichen Wissens im Gehirn.</div></div></div>
+
+<div class="card t4" data-question="minimalpaare">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was sind Minimalpaare?</div>
+<div class="face back">Wortpaare, die sich nur in einem Laut unterscheiden und unterschiedliche Bedeutungen haben.</div>
+</div></div>
+
+<div class="card t4" data-question="umlaute">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum sind Umlaute oft schwierig?</div>
+<div class="face back">Viele Sprachen besitzen die deutschen Umlaute ä, ö und ü nicht.</div>
+</div></div>
+
+<div class="card t4" data-question="konsonantencluster">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was sind Konsonantencluster?</div>
+<div class="face back">Mehrere Konsonanten stehen direkt nebeneinander, z. B. Strumpf.</div>
+</div></div>
+
+<div class="card t4" data-question="phonem">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist ein Phonem?</div>
+<div class="face back">Die kleinste bedeutungsunterscheidende Lauteinheit.</div>
+</div></div>
+
+<div class="card t4" data-question="flexion">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was bedeutet Flexion?</div>
+<div class="face back">Die Veränderung von Wörtern nach grammatischen Kategorien.</div>
+</div></div>
+
+<div class="card t4" data-question="derivation">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist Derivation?</div>
+<div class="face back">Wortbildung durch Vor- oder Nachsilben.</div>
+</div></div>
+
+<div class="card t4" data-question="fugenelement">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist ein Fugenelement?</div>
+<div class="face back">Verbindungselement in Komposita, z. B. Arbeitsamt.</div>
+</div></div>
+
+<div class="card t4" data-question="flektierend">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum gilt Deutsch als flektierende Sprache?</div>
+<div class="face back">Grammatische Informationen werden durch Wortveränderungen ausgedrückt.</div>
+</div></div>
+
+<div class="card t4" data-question="verbzweit">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was bedeutet Verbzweitstellung?</div>
+<div class="face back">Im Hauptsatz steht das finite Verb meist an zweiter Position.</div>
+</div></div>
+
+<div class="card t4" data-question="verbend">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Wo steht das Verb im Nebensatz?</div>
+<div class="face back">Typischerweise am Satzende.</div>
+</div></div>
+
+<div class="card t4" data-question="satzklammer">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist die Satzklammer?</div>
+<div class="face back">Verbteile umschließen andere Satzglieder.</div>
+</div></div>
+
+<div class="card t4" data-question="nebensatz">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum sind Nebensätze schwierig?</div>
+<div class="face back">Die Verbendstellung unterscheidet sich vom Hauptsatz.</div>
+</div></div>
+
+<div class="card t4" data-question="wortstellung">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum ist die deutsche Wortstellung komplex?</div>
+<div class="face back">Sie verändert sich je nach Satzart.</div>
+</div></div>
+
+<div class="card t4" data-question="artikel">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum verursachen Artikel häufig Fehler?</div>
+<div class="face back">Genus, Kasus und Numerus müssen gleichzeitig berücksichtigt werden.</div>
+</div></div>
+
+<div class="card t4" data-question="kasus">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Welche Kasus gibt es im Deutschen?</div>
+<div class="face back">Nominativ, Akkusativ, Dativ und Genitiv.</div>
+</div></div>
+
+<div class="card t4" data-question="genitiv">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Welcher Kasus gilt als besonders schwierig?</div>
+<div class="face back">Der Genitiv wird häufig vermieden oder ersetzt.</div>
+</div></div>
+
+<div class="card t4" data-question="wortschatznetz">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Wie ist das mentale Lexikon organisiert?</div>
+<div class="face back">Als Netzwerk von Bedeutungen und Wortbeziehungen.</div>
+</div></div>
+
+<div class="card t4" data-question="semantischesnetz">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist ein semantisches Netzwerk?</div>
+<div class="face back">Die Verknüpfung bedeutungsverwandter Wörter im Gehirn.</div>
+</div></div>
+
+<div class="card t4" data-question="modalpartikelbeispiel">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Nenne eine typische Modalpartikel.</div>
+<div class="face back">Doch, ja, eben, halt oder wohl.</div>
+</div></div>
+
+<div class="card t4" data-question="grossklein">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist eine Besonderheit der deutschen Orthografie?</div>
+<div class="face back">Substantive werden großgeschrieben.</div>
+</div></div>
+
+<div class="card t4" data-question="lautbuchstabe">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum ist die Laut-Buchstaben-Zuordnung schwierig?</div>
+<div class="face back">Nicht jeder Laut entspricht genau einem Buchstaben.</div>
+</div></div>
+
+<div class="card t4" data-question="zusammenschreibung">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was ist bei der Zusammenschreibung typisch?</div>
+<div class="face back">Neue Bedeutungen entstehen durch Wortverbindungen.</div>
+</div></div>
+
+<div class="card t4" data-question="wortbildung">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Welche Wortbildungsarten sind besonders wichtig?</div>
+<div class="face back">Komposition und Derivation.</div>
+</div></div>
+
+<div class="card t4" data-question="deutschschwierig">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Warum gilt Deutsch für Lernende oft als schwierig?</div>
+<div class="face back">Wegen Genus, Kasus, Wortstellung und komplexer Morphologie.</div>
+</div></div>
+
+<div class="card t4" data-question="sprachbewusstheit">
+<div class="inner-card" onclick="flipCard(this)">
+<div class="face front gray"><div class="category">Besonderheiten des Deutschen</div>Was bedeutet Sprachbewusstheit?</div>
+<div class="face back">Bewusstes Nachdenken über Sprache und Sprachgebrauch.</div>
+</div></div>
+
+</div>
+
+<!-- ========================================= -->
+<!-- QUIZ BUTTON -->
+<!-- ========================================= -->
+
+<button class="quiz-button" onclick="openQuiz()">
+💡 Quiz
+</button>
+
+<!-- ========================================= -->
+<!-- QUIZ -->
+<!-- ========================================= -->
+
+<div id="quizOverlay"
+style="
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.75);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:2000;
+">
+
+<div
+style="
+background:white;
+width:90%;
+max-width:700px;
+border-radius:24px;
+padding:30px;
+">
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+">
+
+<h2 style="margin:0;">
+💡 Quiz
+</h2>
+
+<button
+onclick="closeQuiz()"
+style="
+background:#e74c3c;
+color:white;
+border:none;
+border-radius:12px;
+padding:10px 14px;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+">
+❌
+</button>
+
+</div>
+
+<!-- Fortschrittsbalken -->
+
+<div style="
+
+background:#ddd;
+
+height:14px;
+
+border-radius:999px;
+
+overflow:hidden;
+
+margin:20px 0;
+
+">
+
+<div id="progressBar"
+
+style="
+
+height:100%;
+
+width:0%;
+
+background:#4a90e2;
+
+">
+
+</div>
+
+</div>
+
+<div id="progressText"
+
+style="
+
+text-align:center;
+
+font-weight:bold;
+
+margin-top:8px;
+
+">
+
+0%
+
+</div>
+
+<div id="quizCounter"
+
+style="
+
+font-weight:bold;
+
+margin-bottom:12px;
+
+">
+
+</div>
+
+<div id="quizQuestion"
+
+style="
+
+font-size:24px;
+
+font-weight:bold;
+
+margin-bottom:20px;
+
+">
+
+</div>
+
+<div id="quizOptions"
+style="
+display:flex;
+flex-direction:column;
+gap:12px;
+">
+</div>
+
+<div id="quizResult"
+style="
+display:none;
+text-align:center;
+">
+
+<h2>🎉 Quiz beendet!</h2>
+
+<p id="finalScore"></p>
+
+<button onclick="restartQuiz()">
+🔄 Neues Quiz
+</button>
+
+<button onclick="closeQuiz()">
+❌ Schließen
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+
+</div>
+
+</div>
+</div>
+
+<script>
+
+/* ========================================= */
+/* KARTEN */
+/* ========================================= */
+
+function flipCard(card){
+  card.parentElement.classList.toggle("flipped");
+}
+
+function filterCards(category, btn){
+
+  const cards=document.querySelectorAll(".card");
+  const buttons=document.querySelectorAll(".filter-btn");
+
+  buttons.forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+
+  cards.forEach(card=>{
+
+    if(category==="all"){
+      card.classList.remove("hidden");
+    }
+
+    else{
+      card.classList.toggle(
+        "hidden",
+        !card.classList.contains(category)
+      );
+    }
+
+  });
+
+  updateStats();
+}
+
+function shuffleCards(){
+
+  const container=document.getElementById("cardContainer");
+  const cards=Array.from(container.children);
+
+  for(let i=cards.length-1;i>0;i--){
+
+    const j=Math.floor(Math.random()*(i+1));
+
+    [cards[i],cards[j]]=[cards[j],cards[i]];
+  }
+
+  cards.forEach(card=>container.appendChild(card));
+}
+
+function toggleDarkMode(){
+  document.body.classList.toggle("darkmode");
+}
+
+function resetCards(){
+
+  document.querySelectorAll(".card").forEach(card=>{
+    card.classList.remove("hidden","flipped");
+  });
+
+  document.querySelectorAll(".filter-btn")
+  .forEach(btn=>btn.classList.remove("active"));
+
+  document.querySelector(".filter-btn")
+  .classList.add("active");
+
+  document.getElementById("searchInput").value="";
+
+  updateStats();
+}
+
+function searchCards(){
+
+  const value=document.getElementById(
+    "searchInput"
+  ).value.toLowerCase();
+
+  const cards=document.querySelectorAll(".card");
+
+  cards.forEach(card=>{
+
+    const text = card.innerText.toLowerCase();
+
+    card.classList.toggle(
+      "hidden",
+      !text.includes(value)
+    );
+
+  });
+
+  updateStats();
+}
+
+function updateStats(){
+
+  let visible = 0;
+
+  document.querySelectorAll(".card").forEach(card => {
+
+    if(getComputedStyle(card).display !== "none"){
+
+      visible++;
+
+    }
+
+  });
+
+  document.getElementById("stats").innerText =
+
+    visible + " Karten sichtbar";
+
+}
+
+updateStats();
+
+/* ========================================= */
+/* QUIZ */
+/* ========================================= */
+
+const quizQuestions=[
+{question:"Wie viele Vokale hat das Deutsche ungefähr?",options:["3-5","14-17","8","25"],answer:1},
+{question:"Was bedeutet Auslautverhärtung?",options:["Vokale werden länger","Konsonanten werden verdoppelt","Stimmhafte Konsonanten werden am Wortende stimmlos","Silben werden betont"],answer:2},
+{question:"Warum sind Modalpartikeln schwierig?",options:["Sie fehlen im Deutschen","Sie sind immer bedeutungsgleich","Ihre Bedeutung hängt vom Kontext ab","Sie werden nicht gesprochen"],answer:2},
+{question:"Was ist eine Besonderheit des Genus im Deutschen?",options:["Immer logisch ableitbar","Meist unsystematisch und muss mitgelernt werden","Nur zwei Genera","Nur für Personen"],answer:1},
+
+{
+question:"Welche Bereiche untersucht die Sprachwissenschaft?",
+options:[
+"Nur Grammatik",
+"Sprache im Gehirn, Sprachsystem und Sprachgebrauch",
+"Nur Rechtschreibung",
+"Nur Sprachgeschichte"
+],
+answer:1
+},
+
+{
+question:"Was untersucht die Syntax?",
+options:[
+"Wortbedeutungen",
+"Beziehungen zwischen Zeichen und Dingen",
+"Satzbau und Grammatik",
+"Kommunikationssituationen"
+],
+answer:2
+},
+
+{
+question:"Was untersucht die Semantik?",
+options:[
+"Lautbildung",
+"Satzbau",
+"Bedeutung von Wörtern und Sätzen",
+"Gesprächsführung"
+],
+answer:2
+},
+
+{
+question:"Was untersucht die Pragmatik?",
+options:[
+"Kommunikation im Kontext",
+"Rechtschreibung",
+"Wortarten",
+"Lautsysteme"
+],
+answer:0
+},
+
+{
+question:"Wie versteht die Sprachwissenschaft Sprache meist?",
+options:[
+"Als starres System",
+"Als wandelbares und variables System",
+"Als vollkommen richtig oder falsch",
+"Als unveränderlich"
+],
+answer:1
+},
+
+{
+question:"Womit beschäftigt sich historische Philologie?",
+options:[
+"Sprachunterricht",
+"Sprachwandel und Sprachgeschichte",
+"Aussprachetraining",
+"Wortschatzlernen"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet diachron?",
+options:[
+"Gegenwartsbezogen",
+"Vergleichend",
+"Über die Zeit hinweg",
+"Kontextabhängig"
+],
+answer:2
+},
+
+{
+question:"Wer gilt als Begründer des Strukturalismus?",
+options:[
+"Skinner",
+"Chomsky",
+"Saussure",
+"Piaget"
+],
+answer:2
+},
+
+{
+question:"Was bedeutet langue?",
+options:[
+"tatsächliches Sprechen",
+"Sprachsystem",
+"Körpersprache",
+"Fremdsprache"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet parole?",
+options:[
+"Sprachsystem",
+"Sprachfamilie",
+"konkreter Sprachgebrauch",
+"Lautsystem"
+],
+answer:2
+},
+
+{
+question:"Was ist ein Signifikant?",
+options:[
+"Bedeutung eines Wortes",
+"Laut-/Wortform",
+"Satzstruktur",
+"Schreibweise"
+],
+answer:1
+},
+
+{
+question:"Was ist ein Signifikat?",
+options:[
+"Lautbild",
+"Wortform",
+"Bedeutung/Konzept",
+"Grammatikregel"
+],
+answer:2
+},
+
+{
+question:"Was bedeutet arbiträr?",
+options:[
+"logisch festgelegt",
+"biologisch bestimmt",
+"willkürlich",
+"mathematisch"
+],
+answer:2
+},
+
+{
+question:"Welche Aussage trifft auf Saussure zu?",
+options:[
+"Sprache bildet Realität direkt ab",
+"Bedeutung entsteht durch Unterschiede zwischen Zeichen",
+"Sprache ist biologisch angeboren",
+"Sprache entsteht nur durch Nachahmung"
+],
+answer:1
+},
+
+{
+question:"Wer entwickelte die Generative Grammatik?",
+options:[
+"Austin",
+"Hymes",
+"Chomsky",
+"Vygotskij"
+],
+answer:2
+},
+
+{
+question:"Was ist das Ziel der Universalgrammatik?",
+options:[
+"Eine Weltsprache schaffen",
+"Gemeinsame Prinzipien aller Sprachen finden",
+"Alle Dialekte abschaffen",
+"Grammatik vereinfachen"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet LAD?",
+options:[
+"Language Analysis Device",
+"Language Acquisition Device",
+"Learning and Development",
+"Linguistic Access Definition"
+],
+answer:1
+},
+
+{
+question:"Was versteht Chomsky unter Kompetenz?",
+options:[
+"tatsächliches Sprechen",
+"kommunikative Wirkung",
+"inneres Sprachwissen",
+"soziale Interaktion"
+],
+answer:2
+},
+
+{
+question:"Was versteht Chomsky unter Performanz?",
+options:[
+"Grammatikregeln",
+"tatsächlichen Sprachgebrauch",
+"Wortbildung",
+"Sprachvergleich"
+],
+answer:1
+},
+
+{
+question:"Wer begründete die Sprechakttheorie?",
+options:[
+"Piaget",
+"Austin",
+"Cummins",
+"Skinner"
+],
+answer:1
+},
+
+{
+question:"Welche Aussage passt zur Sprechakttheorie?",
+options:[
+"Sprache beschreibt nur Realität",
+"Sprechen ist Handeln",
+"Sprache entsteht biologisch",
+"Sprache ist nur Grammatik"
+],
+answer:1
+},
+
+{
+question:"Was ist ein illokutionärer Akt?",
+options:[
+"psychologische Wirkung",
+"Lautproduktion",
+"sprachliche Absicht",
+"Satzbau"
+],
+answer:2
+},
+
+{
+question:"Was ist ein perlokutionärer Akt?",
+options:[
+"Satzstruktur",
+"Wirkung auf Hörer:innen",
+"Bedeutung eines Wortes",
+"Grammatikregel"
+],
+answer:1
+},
+
+{
+question:"Wer entwickelte kommunikative Kompetenz?",
+options:[
+"Chomsky",
+"Hymes",
+"Skinner",
+"Saussure"
+],
+answer:1
+},
+
+{
+question:"Kommunikative Kompetenz bedeutet ...",
+options:[
+"nur richtige Grammatik",
+"Sprache sozial angemessen verwenden",
+"viele Fremdwörter kennen",
+"schnell sprechen"
+],
+answer:1
+},
+
+{
+question:"Nach heutigem Verständnis gilt als mehrsprachig, wer ...",
+options:[
+"zwei Sprachen perfekt beherrscht",
+"regelmäßig mehrere Sprachen verwendet",
+"nur Standardsprache spricht",
+"ohne Fehler spricht"
+],
+answer:1
+},
+
+{
+question:"Warum wird Halbsprachigkeit kritisiert?",
+options:[
+"zu modern",
+"wissenschaftlich nicht haltbar und stigmatisierend",
+"zu selten",
+"betrifft nur Kinder"
+],
+answer:1
+},
+
+{
+question:"Welche Theorie sieht Spracherwerb als Reiz-Reaktions-Prozess?",
+options:[
+"Interaktionismus",
+"Behaviorismus",
+"Kognitivismus",
+"Pragmatik"
+],
+answer:1
+},
+
+{
+question:"Wer vertritt den Behaviorismus?",
+options:[
+"Skinner",
+"Chomsky",
+"Bruner",
+"Hymes"
+],
+answer:0
+},
+
+{
+question:"Warum gilt der Behaviorismus als unzureichend?",
+options:[
+"Er erklärt keine kreativen Sprachleistungen",
+"Er ist zu sozial",
+"Er ignoriert Grammatik",
+"Er erklärt zu viel"
+],
+answer:0
+},
+
+{
+question:"Welche Theorie betont angeborene Sprachstrukturen?",
+options:[
+"Behaviorismus",
+"Interaktionismus",
+"Reifungstheorie",
+"Pragmatik"
+],
+answer:2
+},
+
+{
+question:"Wer entwickelte kognitivistische Ansätze?",
+options:[
+"Austin",
+"Piaget",
+"Cummins",
+"Morris"
+],
+answer:1
+},
+
+{
+question:"Im Interaktionismus ist besonders wichtig:",
+options:[
+"soziale Interaktion",
+"Drillübungen",
+"Fehlervermeidung",
+"Rechtschreibung"
+],
+answer:0
+},
+
+{
+question:"Was bedeutet LASS?",
+options:[
+"angeborenes Sprachmodul",
+"Unterstützungssystem der Bezugspersonen",
+"Lautanalyse-System",
+"Lernzielanalyse"
+],
+answer:1
+},
+
+{
+question:"Die Kontrastivhypothese geht davon aus, dass ...",
+options:[
+"L1 keinen Einfluss hat",
+"Unterschiede zwischen Sprachen Fehler verursachen können",
+"alle Sprachen gleich gelernt werden",
+"Grammatik unwichtig ist"
+],
+answer:1
+},
+
+{
+question:"Positiver Transfer bedeutet ...",
+options:[
+"Sprachverlust",
+"Ähnlichkeiten erleichtern das Lernen",
+"Fehler durch Unterschiede",
+"Vermeidung von Sprache"
+],
+answer:1
+},
+
+{
+question:"Negativer Transfer bedeutet ...",
+options:[
+"Lernfortschritt",
+"Sprachvergleich",
+"Interferenz durch Unterschiede",
+"perfekte Zweisprachigkeit"
+],
+answer:2
+},
+
+{
+question:"Was ist eine Interlanguage?",
+options:[
+"eine perfekte Zweitsprache",
+"eine künstliche Sprache",
+"Lernersprache als Übergangssystem",
+"Umgangssprache"
+],
+answer:2
+},
+
+{
+question:"Was bedeutet Fossilierung?",
+options:[
+"perfekter Erwerb",
+"Lernstillstand auf Entwicklungsstufe",
+"Sprachverlust",
+"Rückkehr zur Erstsprache"
+],
+answer:1
+},
+
+{
+question:"Was untersucht die Sprachtypologie?",
+options:[
+"Sprachfehler",
+"Sprachstrukturen und Sprachtypen",
+"nur Dialekte",
+"nur Sprachgeschichte"
+],
+answer:1
+},
+
+{
+question:"Welche Sprache gilt als isolierend?",
+options:[
+"Türkisch",
+"Deutsch",
+"Chinesisch",
+"Latein"
+],
+answer:2
+},
+
+{
+question:"Welche Sprache gilt als agglutinierend?",
+options:[
+"Englisch",
+"Türkisch",
+"Französisch",
+"Deutsch"
+],
+answer:1
+},
+
+{
+question:"Welche Sprache gilt als flektierend?",
+options:[
+"Chinesisch",
+"Türkisch",
+"Deutsch",
+"Vietnamesisch"
+],
+answer:2
+},
+
+{
+question:"Was bedeutet SVO?",
+options:[
+"Subjekt – Verb – Objekt",
+"Satz – Verb – Objekt",
+"Subjekt – Vokal – Objekt",
+"Syntax – Verb – Ordnung"
+],
+answer:0
+},
+
+{
+question:"Welche Wortstellung hat Türkisch typischerweise?",
+options:[
+"SVO",
+"VSO",
+"SOV",
+"OVS"
+],
+answer:2
+},
+
+{
+question:"Welche Wortstellung kommt weltweit am häufigsten vor?",
+options:[
+"OVS",
+"VSO",
+"SOV",
+"OSV"
+],
+answer:2
+},
+
+{
+question:"Was untersucht WALS?",
+options:[
+"Sprachunterricht",
+"weltweite Sprachstrukturen",
+"nur europäische Sprachen",
+"Literaturgeschichte"
+],
+answer:1
+},
+
+{
+question:"Was sind Universalien?",
+options:[
+"individuelle Sprachfehler",
+"Gemeinsamkeiten vieler oder aller Sprachen",
+"Dialekte",
+"Lehrmethoden"
+],
+answer:1
+},
+
+{
+question:"Welche Aussage trifft auf moderne Mehrsprachigkeitsdidaktik zu?",
+options:[
+"Nur Deutsch soll verwendet werden",
+"Erstsprache ist hinderlich",
+"Mehrsprachigkeit ist Ressource und Kompetenz",
+"Sprachvergleich soll vermieden werden"
+],
+answer:2
+}
+
+,
+
+{
+question:"Was sind Minimalpaare?",
+options:[
+"Wörter mit gleicher Bedeutung",
+"Wörter mit unterschiedlicher Schreibweise",
+"Wörter, die sich nur in einem Laut unterscheiden",
+"Wörter aus verschiedenen Sprachen"
+],
+answer:2
+},
+
+{
+question:"Warum sind Umlaute schwierig?",
+options:[
+"Weil sie nicht gesprochen werden",
+"Weil viele Sprachen sie nicht besitzen",
+"Weil sie nur im Dialekt vorkommen",
+"Weil sie immer gleich geschrieben werden"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet Flexion?",
+options:[
+"Wortveränderung nach grammatischen Kategorien",
+"Wortneuschöpfung",
+"Wortverkürzung",
+"Wortübersetzung"
+],
+answer:0
+},
+
+{
+question:"Was ist Derivation?",
+options:[
+"Wortbildung durch Vor- und Nachsilben",
+"Wortstellung im Satz",
+"Lautveränderung",
+"Kasusmarkierung"
+],
+answer:0
+},
+
+{
+question:"Was ist ein Fugenelement?",
+options:[
+"Ein Satzzeichen",
+"Ein Verbindungselement in Komposita",
+"Ein Artikel",
+"Eine Verbform"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet Verbzweitstellung?",
+options:[
+"Das Verb steht immer am Satzende",
+"Das Verb steht an zweiter Stelle",
+"Das Verb steht am Satzanfang",
+"Das Verb wird verdoppelt"
+],
+answer:1
+},
+
+{
+question:"Wo steht das Verb typischerweise im Nebensatz?",
+options:[
+"Am Anfang",
+"An zweiter Stelle",
+"In der Mitte",
+"Am Ende"
+],
+answer:3
+},
+
+{
+question:"Was ist die Satzklammer?",
+options:[
+"Eine Klammer im Text",
+"Verbteile umschließen andere Satzglieder",
+"Ein Nebensatz",
+"Ein Satzzeichen"
+],
+answer:1
+},
+
+{
+question:"Welche Kasus gibt es im Deutschen?",
+options:[
+"Drei",
+"Vier",
+"Fünf",
+"Sechs"
+],
+answer:1
+},
+
+{
+question:"Warum sind Artikel schwierig?",
+options:[
+"Weil sie nie verwendet werden",
+"Weil Genus, Kasus und Numerus beachtet werden müssen",
+"Weil sie immer gleich sind",
+"Weil sie nur im Plural vorkommen"
+],
+answer:1
+},
+
+{
+question:"Welche Wortbildungsarten sind besonders wichtig?",
+options:[
+"Flexion und Syntax",
+"Semantik und Pragmatik",
+"Komposition und Derivation",
+"Phonologie und Morphologie"
+],
+answer:2
+},
+
+{
+question:"Warum gilt Deutsch für Lernende oft als schwierig?",
+options:[
+"Wegen Genus, Kasus und Wortstellung",
+"Weil es keine Regeln gibt",
+"Weil es keine Artikel gibt",
+"Weil alle Wörter gleich aufgebaut sind"
+],
+answer:0
+}
+
+,
+
+{
+question:"Was untersucht die Semiotik?",
+options:[
+"Zeichen und Zeichensysteme",
+"Sprachwandel",
+"Satzbau",
+"Lautbildung"
+],
+answer:0
+},
+
+{
+question:"Was ist ein Ikon?",
+options:[
+"Ein Zeichen mit Ähnlichkeit zum Bezeichneten",
+"Ein Laut",
+"Ein Fremdwort",
+"Eine Satzstruktur"
+],
+answer:0
+},
+
+{
+question:"Was ist ein Index?",
+options:[
+"Ein Zeichen mit direkter Beziehung zum Bezeichneten",
+"Ein Symbol ohne Bedeutung",
+"Eine Wortart",
+"Ein Lautsystem"
+],
+answer:0
+},
+
+{
+question:"Was ist ein Symbol?",
+options:[
+"Ein Zeichen mit konventioneller Bedeutung",
+"Ein Laut",
+"Ein Satz",
+"Ein Dialekt"
+],
+answer:0
+},
+
+{
+question:"Was bedeutet synchron?",
+options:[
+"Sprachentwicklung über die Zeit",
+"Betrachtung einer Sprache zu einem Zeitpunkt",
+"Vergleich zweier Sprachen",
+"Spracherwerb"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet diachron?",
+options:[
+"Betrachtung sprachlicher Entwicklung über die Zeit",
+"Momentaufnahme einer Sprache",
+"Sprachvergleich",
+"Sprachunterricht"
+],
+answer:0
+},
+
+{
+question:"Wer gilt als Begründer des Strukturalismus?",
+options:[
+"Chomsky",
+"Skinner",
+"Saussure",
+"Piaget"
+],
+answer:2
+},
+
+{
+question:"Aus welchen Teilen besteht das Zeichenmodell nach Saussure?",
+options:[
+"Laut und Grammatik",
+"Signifikant und Signifikat",
+"Wort und Satz",
+"Kompetenz und Performanz"
+],
+answer:1
+},
+
+{
+question:"Was ist die Universalgrammatik?",
+options:[
+"Eine Weltsprache",
+"Gemeinsame Prinzipien aller menschlichen Sprachen",
+"Ein Wörterbuch",
+"Eine Unterrichtsmethode"
+],
+answer:1
+},
+
+{
+question:"Was versteht Chomsky unter Kompetenz?",
+options:[
+"Inneres Wissen über Sprache",
+"Sprachunterricht",
+"Schreiben",
+"Kommunikation"
+],
+answer:0
+},
+
+{
+question:"Was versteht Chomsky unter Performanz?",
+options:[
+"Das innere Sprachwissen",
+"Den tatsächlichen Sprachgebrauch",
+"Die Grammatik",
+"Den Wortschatz"
+],
+answer:1
+},
+
+{
+question:"Wofür steht WALS?",
+options:[
+"World Atlas of Language Structures",
+"World Association of Language Studies",
+"World Academic Language System",
+"Written Academic Language Structures"
+],
+answer:0
+}
+
+,
+{
+question:"Wer entwickelte die Universalgrammatik?",
+options:[
+"Piaget",
+"Skinner",
+"Chomsky",
+"Bruner"
+],
+answer:2
+},
+
+{
+question:"Was beschreibt die Universalgrammatik?",
+options:[
+"Gemeinsame Prinzipien aller Sprachen",
+"Eine Weltsprache",
+"Sprachunterricht",
+"Dialekte"
+],
+answer:0
+},
+
+{
+question:"Was bedeutet Nativismus?",
+options:[
+"Sprache wird ausschließlich gelernt",
+"Sprache ist angeboren vorbereitet",
+"Sprache entsteht zufällig",
+"Sprache wird im Unterricht erworben"
+],
+answer:1
+},
+
+{
+question:"Was besagt die kritische Phase?",
+options:[
+"Sprachen können nur in der Schule gelernt werden",
+"Spracherwerb gelingt besonders gut in jungen Jahren",
+"Erwachsene lernen schneller",
+"Sprache ist genetisch festgelegt"
+],
+answer:1
+},
+
+{
+question:"Wer entwickelte das LASS-Konzept?",
+options:[
+"Chomsky",
+"Piaget",
+"Bruner",
+"Skinner"
+],
+answer:2
+},
+
+{
+question:"Wofür steht LASS?",
+options:[
+"Language Acquisition Support System",
+"Language Analysis Support Structure",
+"Learning Acquisition System",
+"Language and Speech System"
+],
+answer:0
+},
+
+{
+question:"Was beschreibt die Zone der nächsten Entwicklung?",
+options:[
+"Den Unterschied zwischen zwei Sprachen",
+"Den Bereich unterstützten Lernens",
+"Die Sprachentwicklung Erwachsener",
+"Eine Grammatikregel"
+],
+answer:1
+},
+
+{
+question:"Wer entwickelte die Zone der nächsten Entwicklung?",
+options:[
+"Piaget",
+"Skinner",
+"Vygotskij",
+"Hymes"
+],
+answer:2
+},
+
+{
+question:"Was bedeutet Scaffolding?",
+options:[
+"Fehlerkorrektur",
+"Temporäre Lernunterstützung",
+"Sprachvergleich",
+"Sprachtest"
+],
+answer:1
+},
+
+{
+question:"Was ist sprachlicher Input?",
+options:[
+"Sprachliches Angebot an Lernende",
+"Fehleranalyse",
+"Sprachprüfung",
+"Muttersprache"
+],
+answer:0
+},
+
+{
+question:"Was versteht man unter Output?",
+options:[
+"Sprachproduktion",
+"Sprachverständnis",
+"Sprachförderung",
+"Sprachvergleich"
+],
+answer:0
+},
+
+{
+question:"Was ist Motherese?",
+options:[
+"Kindgerichtete Sprache",
+"Muttersprache",
+"Dialekt",
+"Schriftsprache"
+],
+answer:0
+},
+
+{
+question:"Welche Theorie betont soziale Interaktion besonders?",
+options:[
+"Behaviorismus",
+"Interaktionismus",
+"Nativismus",
+"Strukturalismus"
+],
+answer:1
+},
+
+{
+question:"Welche Theorie verbindet Sprache und Denkentwicklung?",
+options:[
+"Kognitivismus",
+"Behaviorismus",
+"Kontrastivhypothese",
+"Universalgrammatik"
+],
+answer:0
+},
+
+{
+question:"Was beschreibt die Erwerbsreihenfolge?",
+options:[
+"Typische Stufen des Spracherwerbs",
+"Schulstufen",
+"Sprachfamilien",
+"Schwierigkeitsgrade von Sprachen"
+],
+answer:0
+}
+
+,
+
+{
+question:"Wer entwickelte die Interdependenzhypothese?",
+options:[
+"Piaget",
+"Cummins",
+"Skinner",
+"Saussure"
+],
+answer:1
+},
+
+{
+question:"Was besagt die Interdependenzhypothese?",
+options:[
+"Sprachen beeinflussen sich nicht",
+"Sprachen unterstützen sich gegenseitig",
+"Nur die Erstsprache ist wichtig",
+"Mehrsprachigkeit führt immer zu Problemen"
+],
+answer:1
+},
+
+{
+question:"Was beschreibt die Schwellenhypothese?",
+options:[
+"Sprachen dürfen nicht gemischt werden",
+"Sprachkompetenzen können kognitive Vorteile ermöglichen",
+"Nur Deutsch zählt",
+"Mehrsprachigkeit verhindert Lernen"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet BICS?",
+options:[
+"Bildungssprachliche Kompetenz",
+"Alltagssprachliche Kompetenz",
+"Schriftsprachliche Kompetenz",
+"Kommunikative Grammatik"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet CALP?",
+options:[
+"Alltagssprache",
+"Kommunikative Kompetenz",
+"Bildungssprachliche Kompetenz",
+"Sprachvergleich"
+],
+answer:2
+},
+
+{
+question:"Welche Kompetenz entwickelt sich meist schneller?",
+options:[
+"CALP",
+"BICS",
+"Beide gleich schnell",
+"Keine von beiden"
+],
+answer:1
+},
+
+{
+question:"Wer prägte den Begriff Bildungssprache?",
+options:[
+"Hymes",
+"Cummins",
+"Gogolin",
+"Piaget"
+],
+answer:2
+},
+
+{
+question:"Wer entwickelte das Konzept der kommunikativen Kompetenz?",
+options:[
+"Skinner",
+"Hymes",
+"Chomsky",
+"Austin"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet Translanguaging?",
+options:[
+"Sprachen strikt trennen",
+"Flexible Nutzung des gesamten Sprachrepertoires",
+"Nur Standardsprache verwenden",
+"Übersetzen von Texten"
+],
+answer:1
+},
+
+{
+question:"Was ist Code-Switching?",
+options:[
+"Wechsel zwischen Sprachen",
+"Vergessen einer Sprache",
+"Fehlerhafte Grammatik",
+"Sprachverlust"
+],
+answer:0
+},
+
+{
+question:"Was ist Code-Mixing?",
+options:[
+"Mischung sprachlicher Elemente verschiedener Sprachen",
+"Sprachvergleich",
+"Sprachverlust",
+"Übersetzung"
+],
+answer:0
+},
+
+{
+question:"Was versteht man unter Language Awareness?",
+options:[
+"Bewusstheit über Sprache",
+"Sprachstörungen",
+"Sprachverlust",
+"Dialektforschung"
+],
+answer:0
+},
+
+{
+question:"Was ist additive Mehrsprachigkeit?",
+options:[
+"Eine Sprache ersetzt die andere",
+"Eine weitere Sprache kommt hinzu",
+"Nur schulisches Lernen",
+"Sprachabbau"
+],
+answer:1
+},
+
+{
+question:"Was ist subtraktive Mehrsprachigkeit?",
+options:[
+"Eine neue Sprache verdrängt die Erstsprache",
+"Sprachförderung",
+"Sprachvergleich",
+"Mehrsprachige Bildung"
+],
+answer:0
+},
+
+{
+question:"Was kritisiert Gogolin mit dem Begriff monolingualer Habitus?",
+options:[
+"Mehrsprachigkeit",
+"Einsprachige Orientierung des Bildungssystems",
+"Dialekte",
+"Sprachtypologie"
+],
+answer:1
+},
+
+{
+question:"Warum sind Herkunftssprachen wichtig?",
+options:[
+"Sie behindern den Zweitspracherwerb",
+"Sie sind Teil der Identität und fördern Sprachentwicklung",
+"Sie sollen vermieden werden",
+"Sie spielen keine Rolle"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet sprachsensibler Unterricht?",
+options:[
+"Nur Grammatikunterricht",
+"Unterricht berücksichtigt sprachliche Lernprozesse",
+"Unterricht ohne Fachsprache",
+"Nur Deutschunterricht"
+],
+answer:1
+},
+
+{
+question:"Was bedeutet durchgängige Sprachbildung?",
+options:[
+"Sprachförderung nur im Deutschunterricht",
+"Sprachförderung in allen Fächern",
+"Sprachförderung nur in der Volksschule",
+"Nur Wortschatztraining"
+],
+answer:1
+}
+
+,
+
+{
+question:"Wie viele Vokale besitzt das Deutsche ungefähr?",
+options:[
+"5",
+"8",
+"14–17",
+"25"
+],
+answer:2
+},
+
+{
+question:"Warum gilt das deutsche Vokalsystem als komplex?",
+options:[
+"Weil es nur wenige Vokale gibt",
+"Weil Länge und Qualität bedeutungsunterscheidend sind",
+"Weil alle Vokale gleich ausgesprochen werden",
+"Weil es keine Diphthonge gibt"
+],
+answer:1
+},
+
+{
+question:"Welches Wortpaar zeigt den Unterschied zwischen Lang- und Kurzvokal?",
+options:[
+"Haus – Maus",
+"Bahn – Bann",
+"rot – blau",
+"Kind – Kinder"
+],
+answer:1
+},
+
+{
+question:"Was ist ein Diphthong?",
+options:[
+"Ein langer Konsonant",
+"Eine Wortart",
+"Ein gleitender Vokal",
+"Ein Artikel"
+],
+answer:2
+},
+
+{
+question:"Welche Diphthonge kommen im Deutschen vor?",
+options:[
+"ei, au, eu",
+"aa, oo, uu",
+"sch, ch, ng",
+"ie, ee, aa"
+],
+answer:0
+},
+
+{
+question:"Was bedeutet Auslautverhärtung?",
+options:[
+"Vokale werden länger",
+"Konsonanten werden verdoppelt",
+"Stimmhafte Konsonanten werden am Wortende stimmlos",
+"Silben werden betont"
+],
+answer:2
+},
+
+{
+question:"Was ist eine Komposition?",
+options:[
+"Wortbildung durch Zusammensetzung",
+"Veränderung der Aussprache",
+"Satzanalyse",
+"Kasusbestimmung"
+],
+answer:0
+},
+
+{
+question:"Welches Wort ist eine Komposition?",
+options:[
+"Haus",
+"Milchkaffee",
+"laufen",
+"rot"
+],
+answer:1
+},
+
+{
+question:"Warum gelten deutsche Komposita als schwierig?",
+options:[
+"Sie sind immer kurz",
+"Sie können sehr lang werden",
+"Sie haben kein Genus",
+"Sie bestehen nur aus Verben"
+],
+answer:1
+},
+
+{
+question:"Warum sind Modalpartikeln schwierig?",
+options:[
+"Sie fehlen im Deutschen",
+"Sie sind bedeutungslos",
+"Ihre Bedeutung hängt stark vom Kontext ab",
+"Sie kommen nur in Büchern vor"
+],
+answer:2
+},
+
+{
+question:"Welche der folgenden Wörter ist eine Modalpartikel?",
+options:[
+"doch",
+"Haus",
+"laufen",
+"schön"
+],
+answer:0
+},
+
+{
+question:"Warum ist das Genus im Deutschen schwierig?",
+options:[
+"Es ist oft nicht vorhersagbar",
+"Es gibt nur ein Genus",
+"Es hängt immer vom Geschlecht ab",
+"Es wird nicht verwendet"
+],
+answer:0
+},
+
+{
+question:"Wie viele Genera gibt es im Deutschen?",
+options:[
+"2",
+"3",
+"4",
+"5"
+],
+answer:1
+},
+
+{
+question:"Welche Genera gibt es im Deutschen?",
+options:[
+"Maskulin, Feminin, Neutrum",
+"Singular, Plural, Dual",
+"Nominativ, Dativ, Akkusativ",
+"Präsens, Perfekt, Präteritum"
+],
+answer:0
+},
+
+{
+question:"Was ist das mentale Lexikon?",
+options:[
+"Ein Wörterbuch",
+"Der vernetzte Speicher sprachlichen Wissens",
+"Eine Grammatikregel",
+"Eine Unterrichtsmethode"
+],
+answer:1
+},
+
+{
+question:"Wie ist das mentale Lexikon organisiert?",
+options:[
+"Alphabetisch",
+"Vernetzt",
+"Zufällig",
+"Nach Wortlänge"
+],
+answer:1
+},
+
+{
+question:"Warum ist die deutsche Wortstellung schwierig?",
+options:[
+"Weil sie immer gleich bleibt",
+"Weil das Verb unterschiedliche Positionen einnehmen kann",
+"Weil es keine Regeln gibt",
+"Weil Subjekte fehlen"
+],
+answer:1
+},
+
+{
+question:"Was kennzeichnet den Hauptsatz im Deutschen?",
+options:[
+"Verb am Ende",
+"Verb an zweiter Stelle",
+"Verb an erster Stelle",
+"Kein Verb"
+],
+answer:1
+},
+
+{
+question:"Was kennzeichnet viele Nebensätze im Deutschen?",
+options:[
+"Verb an zweiter Stelle",
+"Verb am Satzanfang",
+"Verb am Satzende",
+"Kein Verb"
+],
+answer:2
+},
+
+{
+question:"Warum ist das Kasussystem schwierig?",
+options:[
+"Weil es keine Fälle gibt",
+"Weil Artikel und Endungen verändert werden",
+"Weil Kasus nie markiert werden",
+"Weil nur ein Kasus existiert"
+],
+answer:1
+}
+
+];
+
+
+let currentQuiz=[];
+let currentQuestionIndex=0;
+let currentScore=0;
+
+function openQuiz(){
+
+  document.getElementById(
+    "quizOverlay"
+  ).style.display="flex";
+
+  currentQuiz=[...quizQuestions]
+  .sort(()=>0.5-Math.random())
+  .slice(0,15);
+
+  currentQuestionIndex=0;
+  currentScore=0;
+
+  document.getElementById(
+    "quizResult"
+  ).style.display="none";
+
+document.getElementById(
+
+  "progressText"
+
+).innerText="0%";
+
+document.getElementById(
+
+  "progressBar"
+
+).style.width="0%";
+
+  showQuestion();
+}
+
+function showQuestion(){
+
+  const q=currentQuiz[currentQuestionIndex];
+
+  document.getElementById(
+    "quizCounter"
+  ).innerText=
+  `Frage ${currentQuestionIndex+1} von 15`;
+
+  document.getElementById(
+    "quizQuestion"
+  ).innerText=q.question;
+
+let percent =
+
+Math.round(((currentQuestionIndex+1)/15)*100);
+
+document.getElementById(
+
+  "progressBar"
+
+).style.width =
+
+percent + "%";
+
+document.getElementById(
+
+  "progressText"
+
+).innerText =
+
+percent + "%";
+
+  const optionsDiv=
+  document.getElementById("quizOptions");
+
+  optionsDiv.innerHTML="";
+
+  q.options.forEach((option,index)=>{
+
+    const btn=document.createElement("button");
+
+    btn.innerText=option;
+
+    btn.style.padding="16px";
+    btn.style.borderRadius="12px";
+    btn.style.border="2px solid #ddd";
+    btn.style.background="white";
+    btn.style.textAlign="left";
+
+    btn.onclick=()=>selectAnswer(index);
+
+    optionsDiv.appendChild(btn);
+
+  });
+
+}
+
+function selectAnswer(selected){
+
+  const q=currentQuiz[currentQuestionIndex];
+
+  const buttons=
+  document.querySelectorAll("#quizOptions button");
+
+  buttons.forEach(btn=>{
+    btn.disabled=true;
+  });
+
+  if(selected===q.answer){
+
+    buttons[selected].style.background="#35b56a";
+    buttons[selected].style.color="white";
+
+    currentScore++;
+
+  }else{
+
+    buttons[selected].style.background="#e74c3c";
+    buttons[selected].style.color="white";
+
+    buttons[q.answer].style.background="#35b56a";
+    buttons[q.answer].style.color="white";
+  }
+
+  setTimeout(()=>{
+
+    currentQuestionIndex++;
+
+    if(currentQuestionIndex<15){
+      showQuestion();
+    }
+    else{
+      finishQuiz();
+    }
+
+  },2000);
+
+}
+
+function finishQuiz(){
+
+  document.getElementById(
+    "quizQuestion"
+  ).innerText="";
+
+  document.getElementById(
+    "quizOptions"
+  ).innerHTML="";
+
+  document.getElementById(
+    "quizCounter"
+  ).innerText="";
+
+  document.getElementById(
+    "progressBar"
+  ).style.width="Quiz beendet 🎉";
+
+  document.getElementById(
+    "progressText"
+  ).innerText="100%";
+
+  document.getElementById(
+    "finalScore"
+  ).innerText=
+`Punkte: ${currentScore}/15`;
+
+  document.getElementById(
+    "quizResult"
+  ).style.display="block";
+
+}
+
+function restartQuiz(){
+  openQuiz();
+}
+
+function closeQuiz(){
+
+  document.getElementById(
+    "quizOverlay"
+  ).style.display="none";
+
+  document.getElementById(
+    "quizResult"
+  ).style.display="none";
+
+}
+
+
+</script>
+
+</body>
+</html>
